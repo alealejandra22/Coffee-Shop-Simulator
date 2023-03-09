@@ -3,7 +3,7 @@ import java.io.*;
 import java.lang.Math;
 //import Scanner for user input, java.io.* to work with files and java.lang.Math for math calculations
 
-public class CL1 {
+public class CoffeeShop{
     public static void main (String[]args) throws IOException {
 
         /*create the variables that accumulate throughout the program outside of the loop. 
