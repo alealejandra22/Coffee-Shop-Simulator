@@ -1,0 +1,191 @@
+import java.util.Scanner;
+import java.io.*;
+import java.lang.Math;
+//import Scanner for user input, java.io.* to work with files and java.lang.Math for math calculations
+
+public class CL1 {
+    public static void main (String[]args) throws IOException {
+
+        /*create the variables that accumulate throughout the program outside of the loop. 
+        If we initialize them inside the loop we will lose the information from the previous iteration.*/
+
+        int menuOptions;
+        double total = 0.00;
+        double subtotal = 0.00;
+        String cart = "---------------- YOUR CART -------------- \n\n";
+
+        /*A do while loop is great for when your loop condition is based on user input and 
+        you don’t have user input on the first run*/
+
+        do{
+
+            /* This will print the user options, reset the Scanner variables, the file variable and ask for user input every time*/
+
+            System.out.println("");
+            System.out.println("Welcome to Mejia Coffee! Please select an option below to continue:");
+            System.out.println("1. Display Menu");
+            System.out.println("2. Add item to order");
+            System.out.println("3. View cart");
+            System.out.println("4. Checkout");
+            System.out.println("5. Exit Mejia Coffee");
+
+            File menu = new File("starbucks_menu.txt");
+            Scanner scMenu = new Scanner(menu); 
+
+            /*when we input different data types on the same Scanner we need to flush it everytime
+            having a scanner variable for String input and another one for integer input simplifies this*/
+
+            Scanner intInput = new Scanner(System.in);
+            menuOptions = intInput.nextInt();
+            Scanner stringInput = new Scanner(System.in);
+
+            //switch is the best option for creating multi-branch statements when we have options like 1,2,3,4,5
+            switch(menuOptions){
+                case 1:
+                    /*we can use a while loop to read the menu and print it using escape characters.
+                    we check if the scanner has the next string and print the next string using .next() 
+                    if the line contains MEJIA or COFFEE or MENU we print it with a different format*/
+                    
+                    while (scMenu.hasNext()){
+                        String line = scMenu.next();
+                        if((line.equals("MEJIA")) || (line.equals("COFFEE")) || (line.equals("MENU"))){
+                            System.out.print(line + " ");
+                            line = scMenu.next();
+                            System.out.print(line + " ");
+                            line = scMenu.next();
+                            System.out.print(line + " \n");
+                            
+                        }else{
+                            System.out.print(line);
+                            System.out.print("|\t");
+                            line = scMenu.next();
+                            System.out.print(line);
+                            System.out.print("|");
+                            line = scMenu.next();
+                            System.out.print(line);
+                            System.out.println("|");
+                        }    
+                    }
+
+                    //resetting the scanner makes sure we are reading from the top of the file
+                    scMenu.reset();
+                    break;
+                
+                case 2: 
+                    System.out.println("Please enter the name of the item as shown on the menu:");
+                    String order = stringInput.nextLine();
+
+                    String line = ("");
+                    boolean isBeverage = false;
+                    
+                    scMenu.reset();
+
+                    /* once the user orders, we read through the file String by String and compare our current String to the
+                    order (user input) with the String method .equals(). If we find it, we know the next one will be the boolean
+                    for beverage and the one after will be the price. we can use a boolean flag set to false to check if the item
+                    has been found and diplay the apprpiate message if not */
+                    boolean itemFound = false;
+
+                    do{
+                        line = scMenu.next();
+
+                        if(line.equals("TRUE")||line.equals("FALSE")){
+                            continue;
+                        }
+
+                        if (line.equals(order)){
+                            itemFound = true;
+                            line = scMenu.next();
+                            if (line.equals("TRUE")){
+                                isBeverage = true;
+
+                            }else if(line.equals("FALSE")){
+                                isBeverage = false;    
+                            }
+                            total = scMenu.nextDouble();
+                            break;
+                        }
+
+                    }while(scMenu.hasNext());
+                    
+                    if (!itemFound){
+                        System.out.println("I'm sorry. We do not carry that item.");
+                        continue;
+                    }
+                        /*if the item is a beverage the boolean isBeverage will be set to true and the if statement will be executed.
+                        according to the drinkSize variable we will modify the total, add it to the subtotal and add the item to the cart */
+
+                        if (isBeverage){
+                            System.out.println("What size would you like for your drink?");
+                            System.out.println("1. Tall (+$0.00)");
+                            System.out.println("2. Grande (+$1.50)");
+                            System.out.println("3. Venti (+$2.75)");
+                            int drinkSize = intInput.nextInt();
+
+                            if(drinkSize == 1){
+                                //total = total;
+                                subtotal = subtotal + total;
+                                cart += "Tall " + order + "  $ " + total + "\n";
+
+                            }else if(drinkSize == 2){
+                                total = total + 1.50;
+                                subtotal = subtotal + total;
+                                cart += "Grande " + order + "  $ " + total + "\n";
+
+                            }else if(drinkSize == 3){
+                                total = total + 2.75;
+                                subtotal = subtotal + total;
+                                cart += "Venti " + order + "  $ " + total + "\n";
+                            }
+
+                            System.out.println("Item was added to your cart");
+                        
+                        /*if isBeverage is false we will ask the user the amount they want and update the total and the cart accordingly
+                        as long as it is not 0. If it is zero we will not add it to the cart nor the subtotal and print item disregarded.*/
+                        }else if(!isBeverage){
+                            System.out.println("How many would you like?");
+                            int bakeryCount = intInput.nextInt();
+
+                            if(bakeryCount != 0){
+                                total = total*bakeryCount;
+                                cart += order + "  $ " + total + "\n";
+                                subtotal = subtotal + total;
+                                System.out.println("Item was added to your cart");
+                            }else 
+                                System.out.println("Ok. Bakery item disregarded");
+                        }
+                        break;
+
+                case 3: 
+                    /* Since our cart variable is a String and we formatted it using escape characters as we modified it, we can 
+                    display it with System.out.println(cart); and then print the subtotal*/
+
+                    System.out.println(cart);
+                    System.out.println("Subtotal: $" + subtotal);
+                    break; 
+
+                case 4: 
+                    /*We print the cart and subtotal as well as the total after tax and if the user enters "CHECKOUT" we will system exit 
+                    to terminate the program */
+                    System.out.println(cart);
+                    System.out.println("Subtotal: $" + subtotal);
+                    double totalAfterTax = (double) Math.round((subtotal + ((subtotal*6.75)/100))*100)/100;
+                    System.out.println("Total after tax: $" + totalAfterTax);
+                    System.out.println("If you wish to complete your purchase, enter CHECKOUT");
+                    if (stringInput.next().equals("CHECKOUT")){
+                        System.out.println("Thank you for your purchase. Enjoy!");
+                        System.exit(0);
+                    }
+
+                     break; 
+
+                case 5:
+                    /* We print "Thank you for shopping at Mejia Coffee." and system exit to terminate the program. */
+                    System.out.println("Thank you for shopping at Mejia Coffee.");
+                    System.exit(0); 
+            }
+
+        }while(menuOptions != 0);
+
+    }
+}
